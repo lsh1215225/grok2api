@@ -22,11 +22,12 @@ from ..quota_defaults import default_quota_set, BASIC_CONSOLE_LIMIT, BASIC_CONSO
 _TBL = "accounts"
 _META = "account_meta"
 _TOKEN_PAYLOAD_QUOTAS = (
-    ("auto", "quota_auto", True),
-    ("fast", "quota_fast", True),
-    ("expert", "quota_expert", True),
-    ("heavy", "quota_heavy", False),
-    ("console", "quota_console", True),
+    ("auto",      "quota_auto",      True),
+    ("fast",      "quota_fast",      True),
+    ("expert",    "quota_expert",    True),
+    ("heavy",     "quota_heavy",     False),
+    ("grok_4_3",  "quota_grok_4_3",  False),  # 补上，避免 super/heavy 账号余额显示为空
+    ("console",   "quota_console",   True),
 )
 
 
@@ -605,13 +606,14 @@ class LocalAccountRepository:
                     SELECT token
                     FROM {_TBL}
                     WHERE deleted_at IS NULL
-                      AND status NOT IN (?, ?, ?)
+                      AND status NOT IN (?, ?, ?, ?)
                     ORDER BY updated_at DESC
                     """,
                     (
                         AccountStatus.ACTIVE.value,
                         AccountStatus.COOLING.value,
                         AccountStatus.DISABLED.value,
+                        AccountStatus.EXPIRED.value,  # EXPIRED 是配额误判，不当作垃圾删除
                     ),
                 )
                 return [row["token"] for row in rows]

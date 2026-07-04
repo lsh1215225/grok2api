@@ -126,7 +126,7 @@ on_demand_min_interval_sec = 300
 deleted_retention_days = 7
 run_at = "03:30"
 batch_size = 5000
-vacuum = true
+vacuum = false   # 默认禁用，避免大库 VACUUM 锁全库（5-30s）；需要时从前台手动开启
 
 
 [account.selection]
